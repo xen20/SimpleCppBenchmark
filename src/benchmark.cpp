@@ -8,33 +8,67 @@ using namespace scppb;
 
 Benchmark::Benchmark(TimeFactor tf)
 {
-	_ft = FormatTuple::getFormatTupleFromTimeFactor(tf);
+	_tf = tf;
+	setTimeFormatString();
 }
 
 Benchmark::~Benchmark() {}
 
-void Benchmark::StartClock()
+void Benchmark::startClock()
 {
 	_startTimePoint = chrono::high_resolution_clock::now();
 }
 
-void Benchmark::StopClock()
+void Benchmark::stopClock()
 {
 	_endTimePoint = chrono::high_resolution_clock::now();
 }
 
-double Benchmark::GetExecutionTime()
+double Benchmark::getExecutionTime()
 {
-	StopClock();
-	auto mStart = chrono::time_point_cast<chrono::microseconds>(_startTimePoint).time_since_epoch().count();
-	auto mEnd = chrono::time_point_cast<chrono::microseconds>(_endTimePoint).time_since_epoch().count();
-
-	auto executionTime = (mEnd - mStart) * _ft.divisor;
-
-	return executionTime;
+	stopClock();
+	return getExecutionTimeInTimeFactor();
 }
 
-void Benchmark::FormatExecutionTime(string function, double executionTime)
+void Benchmark::formatExecutionTime(string function, double executionTime)
 {
-	cout << "Function " + function + " took " << executionTime << _ft.divisorName << "to execute" << endl;
+	cout << "Function " + function + " took " << executionTime << _timeFormatString << " to execute" << endl;
+}
+
+double Benchmark::getExecutionTimeInTimeFactor()
+{
+	using namespace std::chrono;
+
+	auto duration = _endTimePoint - _startTimePoint;
+
+	switch (_tf)
+	{
+	case Seconds:
+		return duration_cast<seconds>(duration).count();
+	case Milliseconds:
+		return duration_cast<milliseconds>(duration).count();
+	case Microseconds:
+		return duration_cast<microseconds>(duration).count();
+	case Nanoseconds:
+		return duration_cast<nanoseconds>(duration).count();
+	}
+}
+
+void Benchmark::setTimeFormatString()
+{
+	switch (_tf)
+	{
+	case Seconds:
+		_timeFormatString = " s";
+		break;
+	case Milliseconds:
+		_timeFormatString = " ms";
+		break;
+	case Microseconds:
+		_timeFormatString = " us";
+		break;
+	case Nanoseconds:
+		_timeFormatString = " ns";
+		break;
+	}
 }

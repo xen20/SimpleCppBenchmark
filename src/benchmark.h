@@ -1,23 +1,34 @@
 #include <chrono>
 #include <iostream>
 
-#include "formatters.h"
-
 namespace scppb
 {
+	using namespace std::chrono;
+
+	enum TimeFactor
+	{
+		Seconds,
+		Milliseconds,
+		Microseconds,
+		Nanoseconds,
+	};
+
 	class Benchmark
 	{
 	public:
 		Benchmark(TimeFactor tf = Milliseconds);
 		virtual ~Benchmark();
-		void StartClock();
-		double GetExecutionTime();
-		void FormatExecutionTime(std::string function, double executionTime);
+		void startClock();
+		double getExecutionTime();
+		void formatExecutionTime(std::string function, double executionTime);
 
 	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> _startTimePoint;
-		std::chrono::time_point<std::chrono::high_resolution_clock> _endTimePoint;
-		void StopClock();
-		FormatTuple _ft;
+		time_point<high_resolution_clock> _startTimePoint;
+		time_point<high_resolution_clock> _endTimePoint;
+		TimeFactor _tf;
+		std::string _timeFormatString;
+		void setTimeFormatString();
+		void stopClock();
+		double getExecutionTimeInTimeFactor();
 	};
 } // namespace scppb
